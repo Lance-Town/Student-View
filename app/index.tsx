@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
@@ -13,19 +13,36 @@ const styles = StyleSheet.create({
   },
 });
 
+// Define the Student interface
+interface Student {
+  id: number;
+  name: string;
+  college: string;
+  state: string;
+  interest: string;
+}
+
 export default function Index() {
+  // Set the initial state
+  const [students, setStudents] = useState<Student[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/students')
+    .then((response) => response.json())
+    .then((data: Student[]) => {
+      setStudents(data);
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={[
-          {key: 'Person 1'},
-          {key: 'Person 2'},
-          {key: 'Person 3'},
-          {key: 'Person 4'},
-          {key: 'Person 5'},
-          {key: 'Person 6'},
-        ]}
-        renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
+        data={students}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
       />
     </View>
   );
